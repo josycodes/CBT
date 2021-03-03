@@ -17,7 +17,7 @@ class TermController extends Controller
 
         return ($first.$second);
     }
-    function createteRM(Request $req){
+    function createterm(Request $req){
          
         $req->validate([
             'termname' => 'required',
@@ -60,7 +60,84 @@ class TermController extends Controller
         if($term->save()){
             return redirect()->route('EditTerm', $unique_id)->with('success','Term Updated!!!');
         }else{
-            return redirect()->route('EditTeacher', $unique_id)->with('toast_error','Term Not Updated!!!');
+            return redirect()->route('EditTerm', $unique_id)->with('toast_error','Term Not Updated!!!');
         }
+    }
+
+    public function activateTerm($id){
+        $condition = [
+            ['status','active'],
+        ];
+        //Deactivate the Active Term first
+        $deactivateActiveTerm = Term::where($condition)->first();
+        
+        if($deactivateActiveTerm){
+            
+            if($deactivateActiveTerm->id === $id){
+                return redirect()->route('allTerms')->with('success','Term is already Active!!!');
+            }else{
+                
+                //Deactivate the Active Term first
+                $deactivateActiveTerm->status = 'inactive';
+                if($deactivateActiveTerm->save()){
+                     //Activate the Desired Term
+                $ActivateTerm = Term::where('id',$id)->first();
+                $ActivateTerm->status = 'active';
+    
+                    if($ActivateTerm->save()){
+                        return redirect()->route('allTerms')->with('toast_success','Term Activated!!!');
+                    }else{
+                        return redirect()->route('allTerms')->with('toast_error','Term Not A!!!');
+                    }
+                }else{
+                    return redirect()->route('allTerms')->with('toast_error','Unexpected Error, Try again');
+                }
+            }    
+        }else{
+            //Activate the Desired Term
+            $ActivateTerm = Term::where('id',$id)->first();
+            
+            $ActivateTerm->status = 'active';
+
+            if($ActivateTerm->save()){
+                return redirect()->route('allTerms')->with('toast_success','Term Activated!!!');
+            }else{
+                return redirect()->route('allTerms')->with('toast_error','Term Not A!!!');
+            }
+        }
+        
+    }
+
+    public function deactivateterm($id){
+        $condition = [
+            ['status','inactive'],
+        ];
+        //Check if the term is already deactivated...
+        $deactivatedterm = Term::where($condition)->first();
+
+        if($deactivatedterm){
+            if($deactivatedterm->id === $id ){
+                return redirect()->route('allTerms')->with('toast_error','Term is already Deactivated');
+            }else{
+                //Deactivate the Term...
+                $deactivateTerm = Term::find($id);
+                $deactivateTerm->status = 'inactive';
+                if($deactivateTerm->save()){
+                    return redirect()->route('allTerms')->with('success','Term Deactivated');
+                }else{
+                    return redirect()->route('allTerms')->with('error','Term Not Deactivated');
+                }
+            }
+        }else{
+            //Deactivate the Term...
+            $deactivateTerm = Term::find($id);
+            $deactivateTerm->status = 'inactive';
+            if($deactivateTerm->save()){
+                return redirect()->route('allTerms')->with('success','Term Deactivated');
+            }else{
+                return redirect()->route('allTerms')->with('error','Term Not Deactivated');
+            }
+        }
+
     }
 }

@@ -83,9 +83,81 @@ class SessionController extends Controller
             return redirect()->route('EditSession', $unique_id)->with('toast_error','Session Not Updated!!!');
         } 
         }
+    }
+    
+    public function activatesession($id){
+        $condition = [
+            ['status','active'],
+        ];
+        //Deactivate the Active Session first
+        $deactivateActiveSession = Session::where($condition)->first();
         
+        if($deactivateActiveSession){
+            
+            if($deactivateActiveSession->id === $id){
+                return redirect()->route('allSessions')->with('success','Session is already Active!!!');
+            }else{
+                
+                //Deactivate the Active Session first
+                $deactivateActiveSession->status = 'inactive';
+                if($deactivateActiveSession->save()){
+                     //Activate the Desired Session
+                $ActivateSession = Session::where('id',$id)->first();
+                $ActivateSession->status = 'active';
+    
+                    if($ActivateSession->save()){
+                        return redirect()->route('allSessions')->with('toast_success','Session Activated!!!');
+                    }else{
+                        return redirect()->route('allSessions')->with('toast_error','Session Not A!!!');
+                    }
+                }else{
+                    return redirect()->route('allSessions')->with('toast_error','Unexpected Error, Try again');
+                }
+            }    
+        }else{
+            //Activate the Desired Session
+            $ActivateSession = Session::where('id',$id)->first();
+            
+            $ActivateSession->status = 'active';
 
-        
+            if($ActivateSession->save()){
+                return redirect()->route('allSessions')->with('toast_success','Session Activated!!!');
+            }else{
+                return redirect()->route('allSessions')->with('toast_error','Session Not A!!!');
+            }
+        }
+    }
+    public function deactivatesession($id){
+        $condition = [
+            ['status','inactive'],
+        ];
+        //Check if the session is already deactivated...
+        $deactivatedsession = Session::where($condition)->first();
+
+        if($deactivatedsession){
+            if($deactivatedsession->id === $id ){
+                return redirect()->route('allSessions')->with('toast_error','Session is already Deactivated');
+            }else{
+                //Deactivate the Session...
+                $deactivateSession = Session::find($id);
+                $deactivateSession->status = 'inactive';
+                if($deactivateSession->save()){
+                    return redirect()->route('allSessions')->with('success','Session Deactivated');
+                }else{
+                    return redirect()->route('allSessions')->with('error','Session Not Deactivated');
+                }
+            }
+        }else{
+            //Deactivate the Session...
+            $deactivateSession = Session::find($id);
+            $deactivateSession->status = 'inactive';
+            if($deactivateSession->save()){
+                return redirect()->route('allSessions')->with('success','Session Deactivated');
+            }else{
+                return redirect()->route('allSessions')->with('error','Session Not Deactivated');
+            }
+        }
+
     }
 
 }
