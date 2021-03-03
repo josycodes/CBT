@@ -38,6 +38,10 @@ Route::get('/BasicSetting', function () {
     return view('admin.basic');
 })->name('BasicSetting');
 
+Route::get('/UserExam', function () {
+    return view('admin.userexam');
+})->name('UserExam');
+
 // Route::get('/CreateBasic', function() {
 //     return view('admin.create-basic');
 // })->name('CreateBasic');
@@ -106,6 +110,16 @@ Route::get('allTeachers',[TeacherController::class , 'viewallteachers'])->name('
 Route::get('allSessions',[SessionController::class , 'viewallsessions'])->name('allSessions');
 
 Route::get('allSubjects',[SubjectController::class , 'viewallsubjects'])->name('allSubjects');
+
+//ACTIVATE TERM AND SESSION.....
+Route::get('activateterm/{id}' ,[TermController::class , 'activateterm'])->name('activateterm');
+
+Route::get('activatesession/{id}' ,[SessionController::class , 'activatesession'])->name('activatesession');
+
+//DEACTIVATE TERM AND SESSION....
+Route::get('deactivateterm/{id}' ,[TermController::class , 'deactivatesession'])->name('deactivateterm');
+
+Route::get('deactivatesession/{id}' ,[SessionController::class , 'deactivatesession'])->name('deactivatesession');
 
 //Route for import excel data to database.
 Route::post('importExcel', [RegisteredUserController::class, 'importExcel'])->name('importExcel');
